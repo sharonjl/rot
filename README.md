@@ -14,6 +14,10 @@ import (
 )
 
 func main() {
+	// Go routines are launched only when cpu
+	// and mem usages are under this limit.
+	rot.SetLimits(0.8, 0.8)
+
 	// Launch go routine, blocks until the routine is launched.
 	rot.Go(func() {
 		// do something

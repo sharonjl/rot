@@ -16,10 +16,10 @@ func Test(t *testing.T) {
 	go func() {
 		for {
 			if rand.Float32() > 0.95 {
-				MustGo(highUsage(done))
+				Go(highUsage(done))
 				hc++
 			} else {
-				MustGo(lowUsage)
+				Go(lowUsage)
 				lc++
 			}
 		}

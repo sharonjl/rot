@@ -8,38 +8,39 @@ import (
 	"github.com/shirou/gopsutil/mem"
 )
 
-var statRW = sync.RWMutex{}
 var (
-	hasCPU     = false
-	lastCPU    cpu.TimesStat
-	cpuUsage   = 0.0
-	memUsage   = 0.0
-	updateRate = time.Millisecond
+	last               cpu.TimesStat
+	rw                 = sync.RWMutex{}
+	hasCPU             = false
+	cpuUsage, memUsage = 0.0, 0.0
 )
 
-func SetUpdateRate(d time.Duration) {
-	updateRate = d
-}
-
-func updateStats() {
-	for range time.NewTicker(updateRate).C {
+func updateStats(r time.Duration) {
+	for range time.NewTicker(r).C {
 		p, _ := cpu.Times(false)
 		v, _ := mem.VirtualMemory()
 
-		statRW.Lock()
+		rw.Lock()
 		if hasCPU {
-			b := calculateBusy(lastCPU, p[0])
+			b := calculateBusy(last, p[0])
 			memUsage = v.UsedPercent / 100
 			if b > 0 {
 				cpuUsage = b
-				lastCPU = p[0]
+				last = p[0]
 			}
 		} else {
-			lastCPU = p[0]
+			last = p[0]
 			hasCPU = true
 		}
-		statRW.Unlock()
+		rw.Unlock()
 	}
+}
+
+func limited(maxCPU, maxMem float64) bool {
+	rw.RLock()
+	defer rw.RUnlock()
+
+	return memUsage > maxMem || cpuUsage > maxCPU || !hasCPU
 }
 
 func getAllBusy(t cpu.TimesStat) (float64, float64) {

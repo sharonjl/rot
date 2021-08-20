@@ -28,7 +28,7 @@ func updateStats() {
 
 		statRW.Lock()
 		if hasCPU {
-			b := calculateBusy(lastCPU, p[0]) // calculateAllBusy(lastCPU, p)
+			b := calculateBusy(lastCPU, p[0])
 			memUsage = v.UsedPercent / 100
 			if b > 0 {
 				cpuUsage = b

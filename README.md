@@ -23,11 +23,12 @@ func main() {
 		// do something
 	})
 
-	// Try launch go routine, returns false if it is not launched.
-	didRun := rot.GoTry(func() {
+	// Return false if rot was unable to launch the go routine,
+	// because the cpu and mem usage has exceeded.
+	ok := rot.GoTry(func() {
 		// do something
 	})
-	fmt.Println("didRun =", didRun)
+	fmt.Println("did launch =", ok)
 }
 
 ```
